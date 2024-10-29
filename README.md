@@ -37,6 +37,7 @@ B-Trees: Efficient for CRUD operations and used to maintain the simulated databa
 Segment Trees: Core of the project, these data structures enable efficient aggregate queries over specific ranges in O(log n) time.
 
 **🚀 How It Works**
+
 Creating Data Records: Users can add records to the database via the CRUD module.
 
 Executing Queries:
