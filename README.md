@@ -1,11 +1,10 @@
-# 🚀 **Optimizing Aggregate Queries in Databases using Segment Trees
-**
+# 🚀 **Optimizing Aggregate Queries in Databases using Segment Trees**
 ![Repo Size](https://img.shields.io/github/repo-size/BhargavShekokar3425/Group2-G4?style=for-the-badge)
 ![License](https://img.shields.io/github/license/BhargavShekokar3425/Group2-G4?style=for-the-badge)
 ![Stars](https://img.shields.io/github/stars/BhargavShekokar3425/Group2-G4?style=for-the-badge)
 ![Forks](https://img.shields.io/github/forks/BhargavShekokar3425/Group2-G4?style=for-the-badge)
 
-📝** Project Overview**
+📝**Project Overview**
 This project demonstrates how Segment Trees can be utilized to optimize aggregate queries in a simulated database system, providing a unique approach to handling SUM, MIN, MAX, and more, alongside support for WHERE clauses in queries. With efficient data retrieval and processing, this project shows how advanced data structures can enhance database operations, offering a simulation of CRUD operations via B-Trees for efficient data storage and Segment Trees for rapid aggregation.
 
 🔍 **Problem Statement**
@@ -21,7 +20,7 @@ Optimized Querying: Segment Trees are used to speed up aggregate queries such as
 WHERE Clause Support: Adds flexibility by enabling SQL-like filtering with WHERE clauses.
 Fast Query Processing: Binary search and Segment Trees combine to deliver swift query execution and optimal data processing.
 
-🛠️** Technical Details**  
+🛠️**Technical Details**  
 Project Structure
 This project is organized to provide a structured flow, simulating a database environment where users can execute optimized queries.
 
