@@ -88,7 +88,7 @@ public:
 };
 
 int main() {
-    string filename = "employees.csv";
+    string filename = "data.csv";
     CSVHandler csvHandler(filename);
 
     // Read data from CSV
