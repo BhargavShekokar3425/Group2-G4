@@ -1,10 +1,13 @@
+#include<bits/stdc++.h>
 #include <iostream>
 #include <vector>
 #include <queue>
-#include <limits>
+#include "SegmentTree.hpp"
+
 using namespace std;
 
-struct TreeNode {
+class TreeNode {
+    public:
     int sum;
     int min;
     int max;
@@ -19,6 +22,7 @@ struct TreeNode {
         count = 1;  // There's one element
         left = right = nullptr;
     }
+    friend class SegmentTree;
 };
 
 // Class to handle Segment Tree operations
