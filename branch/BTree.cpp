@@ -1,5 +1,3 @@
-// BTree.cpp
-
 #include "BTree.hpp"
 #include <iostream>
 #include <vector>
@@ -8,6 +6,7 @@ using namespace std;
 
 // Constructor for BTreeNode
 BTreeNode::BTreeNode(int degree, bool isLeaf) {
+    this->degree = degree;  // Store degree in each node
     this->isLeaf = isLeaf;
     keys.reserve(2 * degree - 1);
     names.reserve(2 * degree - 1);

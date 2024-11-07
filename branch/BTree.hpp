@@ -1,5 +1,3 @@
-// BTree.hpp
-
 #ifndef BTREE_HPP
 #define BTREE_HPP
 
@@ -9,9 +7,10 @@
 
 class BTreeNode {
 public:
+    int degree;  // Degree of the B-tree node
     bool isLeaf;
     std::vector<int> keys;
-    std::vector<std::string> names;  // Assuming a name attribute
+    std::vector<std::string> names;  // Name attribute
     std::vector<int> attribute1;     // First additional attribute (integer)
     std::vector<float> attribute2;   // Second additional attribute (float)
     std::vector<BTreeNode*> children;

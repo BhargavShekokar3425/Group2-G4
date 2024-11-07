@@ -1,26 +1,24 @@
 #ifndef CSV1_HPP
 #define CSV1_HPP
 
-#include <iostream>
-#include <fstream>
 #include <vector>
 #include <string>
-
-using namespace std;
+#include <iostream>
 
 class CSVHandler {
-public:
-    CSVHandler(const string& filename);
-    void loadCSV();
-    void displayCSV();
-    void addRow(const vector<string>& row);
-    void updateRow(int rowNumber, const vector<string>& newRow);
-    void deleteRow(int rowNumber);
-    void saveCSV();
-
 private:
-    string filename;
-    vector<vector<string>> data;
+    std::string filename;
+    std::vector<std::vector<std::string>> data;
+
+public:
+    CSVHandler(const std::string& filename);
+    void loadCSV();
+    void displayCSV() const;
+    void addRow(const std::vector<std::string>& row);
+    void updateRow(int rowNumber, const std::vector<std::string>& newRow);
+    void deleteRow(int rowNumber);
+    void saveCSV() const;
+    void menu();  // New menu function for interactive mode
 };
 
-#endif // CSV_HPP
+#endif // CSV1_HPP
