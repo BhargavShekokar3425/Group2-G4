@@ -14,7 +14,7 @@ This project demonstrates how **Segment Trees** can be utilized to optimize aggr
 
 ## 🔍 Problem Statement
 
-Aggregate queries such as `SUM`, 'COUNT', `MIN`, and `MAX` are common in databases but can become slow with large datasets if not optimized. This project uses Segment Trees—common in competitive programming for range queries—to speed up aggregate query processing in a database setting. Key components of the project include:
+Aggregate queries such as `SUM`, `COUNT`, `MIN`, and `MAX` are common in databases but can become slow with large datasets if not optimized. This project uses Segment Trees—common in competitive programming for range queries—to speed up aggregate query processing in a database setting. Key components of the project include:
 
 - **Database Simulation**: CRUD operations implemented using B-Trees for efficient storage and retrieval.
 - **Optimized Aggregate Queries**: Standard database queries are optimized with Segment Trees for faster processing.
