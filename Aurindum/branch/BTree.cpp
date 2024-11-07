@@ -1,171 +1,301 @@
-#include "BTree.hpp"
 #include <iostream>
 #include <vector>
-
+#include <string>
 using namespace std;
 
-// Constructor for BTreeNode
-BTreeNode::BTreeNode(int degree, bool isLeaf) {
-    this->degree = degree;  // Store degree in each node
-    this->isLeaf = isLeaf;
-    keys.reserve(2 * degree - 1);
-    names.reserve(2 * degree - 1);
-    attribute1.reserve(2 * degree - 1);
-    attribute2.reserve(2 * degree - 1);
-    children.reserve(2 * degree);
-}
+class BTreeNode {
+public:
+    vector<int> keys;         // IDs
+    vector<string> names;      // Names
+    vector<int> ages;          // Ages
+    vector<float> salaries;    // Salaries
+    vector<BTreeNode*> children;
+    bool leaf;
+    int t;                     // Minimum degree
 
-// Function to traverse the tree
-void BTreeNode::traverse() {
-    int i;
-    for (i = 0; i < keys.size(); i++) {
-        if (!isLeaf)
-            children[i]->traverse();
-        cout << "Key: " << keys[i] << ", Name: " << names[i] << ", Attr1: " << attribute1[i]
-             << ", Attr2: " << attribute2[i] << endl;
+    BTreeNode(int _t, bool _leaf);
+
+    void insertNonFull(int key, const string& name, int age, float salary);
+    void splitChild(int i, BTreeNode *y);
+    BTreeNode *search(int key);
+    void remove(int key); // To be implemented fully as needed
+
+    void printAll();
+    float querySum(); // Calculates the sum of salaries in this node and children recursively
+
+    friend class BTree;
+};
+
+class BTree {
+    BTreeNode *root;
+    int t;
+
+public:
+    BTree(int _t) {
+        root = nullptr;
+        t = _t;
     }
-    if (!isLeaf)
-        children[i]->traverse();
+
+    void insert(int key, const string& name, int age, float salary);
+    void remove(int key);
+    BTreeNode* search(int key);
+    void update(int key, const string& name, int age, float salary);
+    float querySum();
+    void printAllRecords();
+};
+
+BTreeNode::BTreeNode(int _t, bool _leaf) {
+    t = _t;
+    leaf = _leaf;
 }
 
-// Search function
-BTreeNode* BTreeNode::search(int key) {
-    int i = 0;
-    while (i < keys.size() && key > keys[i])
-        i++;
+void BTree::insert(int key, const string& name, int age, float salary) {
+    if (root == nullptr) {
+        root = new BTreeNode(t, true);
+        root->keys.push_back(key);
+        root->names.push_back(name);
+        root->ages.push_back(age);
+        root->salaries.push_back(salary);
+    } else {
+        if (static_cast<int>(root->keys.size()) == 2 * t - 1) {
+            BTreeNode *s = new BTreeNode(t, false);
+            s->children.push_back(root);
+            s->splitChild(0, root);
 
-    if (i < keys.size() && keys[i] == key)
-        return this;
-
-    if (isLeaf)
-        return nullptr;
-
-    return children[i]->search(key);
+            int i = 0;
+            if (s->keys[0] < key) i++;
+            s->children[i]->insertNonFull(key, name, age, salary);
+            root = s;
+        } else {
+            root->insertNonFull(key, name, age, salary);
+        }
+    }
 }
 
-// Insert non-full node
-void BTreeNode::insertNonFull(int key, const string& name, int attr1, float attr2) {
-    int i = keys.size() - 1;
+void BTreeNode::insertNonFull(int key, const string& name, int age, float salary) {
+    int i = static_cast<int>(keys.size()) - 1;
 
-    if (isLeaf) {
+    if (leaf) {
         keys.push_back(0);
         names.push_back("");
-        attribute1.push_back(0);
-        attribute2.push_back(0.0);
+        ages.push_back(0);
+        salaries.push_back(0.0);
 
         while (i >= 0 && keys[i] > key) {
             keys[i + 1] = keys[i];
             names[i + 1] = names[i];
-            attribute1[i + 1] = attribute1[i];
-            attribute2[i + 1] = attribute2[i];
+            ages[i + 1] = ages[i];
+            salaries[i + 1] = salaries[i];
             i--;
         }
-
         keys[i + 1] = key;
         names[i + 1] = name;
-        attribute1[i + 1] = attr1;
-        attribute2[i + 1] = attr2;
-
-        cout << "Inserted key " << key << " with attributes." << endl;
+        ages[i + 1] = age;
+        salaries[i + 1] = salary;
     } else {
-        while (i >= 0 && keys[i] > key)
-            i--;
-
-        if (children[i + 1]->keys.size() == 2 * degree - 1) {
+        while (i >= 0 && keys[i] > key) i--;
+        if (static_cast<int>(children[i + 1]->keys.size()) == 2 * t - 1) {
             splitChild(i + 1, children[i + 1]);
-            if (keys[i + 1] < key)
-                i++;
+            if (keys[i + 1] < key) i++;
         }
-        children[i + 1]->insertNonFull(key, name, attr1, attr2);
+        children[i + 1]->insertNonFull(key, name, age, salary);
     }
 }
 
-// Split child function
-void BTreeNode::splitChild(int i, BTreeNode* y) {
-    BTreeNode* z = new BTreeNode(degree, y->isLeaf);
-    z->keys.resize(degree - 1);
-    z->names.resize(degree - 1);
-    z->attribute1.resize(degree - 1);
-    z->attribute2.resize(degree - 1);
+void BTreeNode::splitChild(int i, BTreeNode *y) {
+    BTreeNode *z = new BTreeNode(y->t, y->leaf);
+    z->keys.assign(y->keys.begin() + t, y->keys.end());
+    z->names.assign(y->names.begin() + t, y->names.end());
+    z->ages.assign(y->ages.begin() + t, y->ages.end());
+    z->salaries.assign(y->salaries.begin() + t, y->salaries.end());
 
-    for (int j = 0; j < degree - 1; j++) {
-        z->keys[j] = y->keys[j + degree];
-        z->names[j] = y->names[j + degree];
-        z->attribute1[j] = y->attribute1[j + degree];
-        z->attribute2[j] = y->attribute2[j + degree];
+    y->keys.resize(t - 1);
+    y->names.resize(t - 1);
+    y->ages.resize(t - 1);
+    y->salaries.resize(t - 1);
+
+    if (!y->leaf) {
+        z->children.assign(y->children.begin() + t, y->children.end());
+        y->children.resize(t);
     }
-
-    if (!y->isLeaf) {
-        z->children.resize(degree);
-        for (int j = 0; j < degree; j++)
-            z->children[j] = y->children[j + degree];
-    }
-
-    y->keys.resize(degree - 1);
-    y->names.resize(degree - 1);
-    y->attribute1.resize(degree - 1);
-    y->attribute2.resize(degree - 1);
 
     children.insert(children.begin() + i + 1, z);
-    keys.insert(keys.begin() + i, y->keys[degree - 1]);
-    names.insert(names.begin() + i, y->names[degree - 1]);
-    attribute1.insert(attribute1.begin() + i, y->attribute1[degree - 1]);
-    attribute2.insert(attribute2.begin() + i, y->attribute2[degree - 1]);
+    keys.insert(keys.begin() + i, y->keys[t - 1]);
+    names.insert(names.begin() + i, y->names[t - 1]);
+    ages.insert(ages.begin() + i, y->ages[t - 1]);
+    salaries.insert(salaries.begin() + i, y->salaries[t - 1]);
 }
 
-// BTree constructor
-BTree::BTree(int degree) {
-    root = nullptr;
-    this->degree = degree;
+BTreeNode* BTree::search(int key) {
+    return (root == nullptr) ? nullptr : root->search(key);
 }
 
-// Insert function for BTree
-void BTree::insert(int key, const string& name, int attr1, float attr2) {
-    if (root == nullptr) {
-        root = new BTreeNode(degree, true);
-        root->keys.push_back(key);
-        root->names.push_back(name);
-        root->attribute1.push_back(attr1);
-        root->attribute2.push_back(attr2);
-    } else {
-        if (root->keys.size() == 2 * degree - 1) {
-            BTreeNode* s = new BTreeNode(degree, false);
-            s->children.push_back(root);
-            s->splitChild(0, root);
-            int i = 0;
-            if (s->keys[0] < key)
-                i++;
-            s->children[i]->insertNonFull(key, name, attr1, attr2);
-            root = s;
+BTreeNode* BTreeNode::search(int key) {
+    int i = 0;
+    while (i < static_cast<int>(keys.size()) && key > keys[i]) i++;
+    if (i < static_cast<int>(keys.size()) && keys[i] == key) return this;
+    if (leaf) return nullptr;
+    return children[i]->search(key);
+}
+
+void BTree::update(int key, const string& name, int age, float salary) {
+    BTreeNode* node = search(key);
+    if (node) {
+        for (size_t i = 0; i < node->keys.size(); i++) {
+            if (node->keys[i] == key) {
+                node->names[i] = name;
+                node->ages[i] = age;
+                node->salaries[i] = salary;
+                cout << "Record updated successfully!" << endl;
+                return;
+            }
+        }
+    }
+    cout << "Record not found!" << endl;
+}
+
+void BTreeNode::printAll() {
+    for (size_t i = 0; i < keys.size(); i++) {
+        if (!leaf) children[i]->printAll();
+        cout << "ID: " << keys[i] << ", Name: " << names[i] << ", Age: " << ages[i] << ", Salary: " << salaries[i] << endl;
+    }
+    if (!leaf) children[keys.size()]->printAll();
+}
+
+void BTree::printAllRecords() {
+    if (root) root->printAll();
+}
+
+float BTreeNode::querySum() {
+    float sum = 0;
+    for (size_t i = 0; i < salaries.size(); i++) {
+        sum += salaries[i];
+    }
+    for (auto child : children) {
+        sum += child->querySum();
+    }
+    return sum;
+}
+
+float BTree::querySum() {
+    return root ? root->querySum() : 0.0f;
+}
+
+void BTreeNode::remove(int key) {
+    // Find the index of the key to be removed
+    int i = 0;
+    while (i < keys.size() && keys[i] < key) {
+        i++;
+    }
+
+    // If the key is found in the current node
+    if (i < keys.size() && keys[i] == key) {
+        if (leaf) {
+            // Remove the key from the leaf node
+            keys.erase(keys.begin() + i);
+            names.erase(names.begin() + i);
+            ages.erase(ages.begin() + i);
+            salaries.erase(salaries.begin() + i);
         } else {
-            root->insertNonFull(key, name, attr1, attr2);
+            // Handle non-leaf nodes (this is more complex and requires further logic)
+            cout << "Removing a key from a non-leaf node is not implemented yet." << endl;
+        }
+    } else if (!leaf) {
+        // Recur to the child node
+        children[i]->remove(key);
+    }
+}
+
+void BTree::remove(int key) {
+    if (root != nullptr) {
+        root->remove(key);
+        if (root->keys.empty()) {
+            // If root has no keys, make the first child the new root (if it exists)
+            BTreeNode* oldRoot = root;
+            if (root->leaf) {
+                root = nullptr;
+            } else {
+                root = root->children[0];
+            }
+            delete oldRoot;
         }
     }
 }
 
-// Traverse function for BTree
-void BTree::traverse() {
-    if (root)
-        root->traverse();
-}
+int main() {
+    BTree tree(3);
+    int choice;
+    int id, age;
+    string name;
+    float salary;
 
-// Search function for BTree
-BTreeNode* BTree::search(int key) {
-    return root ? root->search(key) : nullptr;
-}
+    do {
+        cout << "\nMenu:\n";
+        cout << "1. Insert Record\n";
+        cout << "2. Delete Record\n";
+        cout << "3. Search Record\n";
+        cout << "4. Update Record\n";
+        cout << "5. Query (Sum)\n";
+        cout << "6. View All Records\n";
+        cout << "7. Exit\n";
+        cout << "Enter your choice: ";
+        cin >> choice;
 
-// Remove function for BTree
-void BTree::remove(int key) {
-    if (!root) {
-        cout << "The tree is empty.\n";
-        return;
-    }
+        switch (choice) {
+            case 1:
+                cout << "Enter ID: ";
+                cin >> id;
+                cout << "Enter Name: ";
+                cin.ignore();
+                getline(cin, name);
+                cout << "Enter Age: ";
+                cin >> age;
+                cout << "Enter Salary: ";
+                cin >> salary;
+                tree.insert(id, name, age, salary);
+                break;
+            case 2:
+                cout << "Enter ID to delete: ";
+                cin >> id;
+                tree.remove(id);
+                break;
+            case 3:
+                cout << "Enter ID to search: ";
+                cin >> id;
+                {
+                    BTreeNode* result = tree.search(id);
+                    if (result) {
+                        cout << "Found record - ID: " << id << endl;
+                    } else {
+                        cout << "Record not found!" << endl;
+                    }
+                }
+                break;
+            case 4:
+                cout << "Enter ID to update: ";
+                cin >> id;
+                cout << "Enter new Name: ";
+                cin.ignore();
+                getline(cin, name);
+                cout << "Enter new Age: ";
+                cin >> age;
+                cout << "Enter new Salary: ";
+                cin >> salary;
+                tree.update(id, name, age, salary);
+                break;
+            case 5:
+                cout << "Total Salary Sum: " << tree.querySum() << endl;
+                break;
+            case 6:
+                tree.printAllRecords();
+                break;
+            case 7:
+                cout << "Exiting..." << endl;
+                break;
+            default:
+                cout << "Invalid choice, try again!" << endl;
+        }
+    } while (choice != 7);
 
-    root->remove(key);
-
-    if (root->keys.empty()) {
-        BTreeNode* temp = root;
-        root = root->isLeaf ? nullptr : root->children[0];
-        delete temp;
-    }
+    return 0;
 }

@@ -1,50 +1,48 @@
 #ifndef BTREE_HPP
 #define BTREE_HPP
 
+#include <iostream>
 #include <vector>
 #include <string>
-#include <iostream>
+
+using namespace std;
 
 class BTreeNode {
 public:
-    int degree;  // Degree of the B-tree node
-    bool isLeaf;
-    std::vector<int> keys;
-    std::vector<std::string> names;  // Name attribute
-    std::vector<int> attribute1;     // First additional attribute (integer)
-    std::vector<float> attribute2;   // Second additional attribute (float)
-    std::vector<BTreeNode*> children;
+    vector<int> keys;         // IDs
+    vector<string> names;      // Names
+    vector<int> ages;          // Ages
+    vector<float> salaries;    // Salaries
+    vector<BTreeNode*> children;
+    bool leaf;
+    int t;                     // Minimum degree
 
-    BTreeNode(int degree, bool isLeaf);
-    void traverse();
-    BTreeNode* search(int key);
-    void insertNonFull(int key, const std::string& name, int attr1, float attr2);
-    void splitChild(int i, BTreeNode* y);
-    void remove(int key);
-    int findKey(int key);
-    void removeFromLeaf(int idx);
-    void removeFromNonLeaf(int idx);
-    int getPred(int idx);
-    int getSucc(int idx);
-    void fill(int idx);
-    void borrowFromPrev(int idx);
-    void borrowFromNext(int idx);
-    void merge(int idx);
+    BTreeNode(int _t, bool _leaf);
+
+    void insertNonFull(int key, const string& name, int age, float salary);
+    void splitChild(int i, BTreeNode *y);
+    BTreeNode *search(int key);
+    void remove(int key); // To be implemented fully as needed
+
+    void printAll();
+    float querySum(); // Calculates the sum of salaries in this node and children recursively
 
     friend class BTree;
 };
 
 class BTree {
-private:
-    BTreeNode* root;
-    int degree;
+    BTreeNode *root;
+    int t;
 
 public:
-    BTree(int degree);
-    void traverse();
-    BTreeNode* search(int key);
-    void insert(int key, const std::string& name, int attr1, float attr2);
+    BTree(int _t);
+
+    void insert(int key, const string& name, int age, float salary);
     void remove(int key);
+    BTreeNode* search(int key);
+    void update(int key, const string& name, int age, float salary);
+    float querySum();
+    void printAllRecords();
 };
 
 #endif // BTREE_HPP
