@@ -6,11 +6,10 @@
 using namespace std;
 
 CSVHandler::CSVHandler(const string& filename) : filename(filename) {}
-
 void CSVHandler::loadCSV() {
     data.clear();
-    cout << ("./branch/data/" + filename) << endl;
-    ifstream file("./branch/data/" + filename);
+    cout << ("./testbranch/data/" + filename) << endl;
+    ifstream file("./testbranch/data/" + filename);
 
     if (!file.is_open()) {
         cerr << "Error: File " << filename << " does not exist in the data folder.\n";
@@ -29,6 +28,24 @@ void CSVHandler::loadCSV() {
     }
 
     cout << "Loaded successfully.\n";
+    file.close();
+}
+
+void CSVHandler::saveCSV() const {
+    ofstream file("./testbranch/data/" + filename);
+
+    if (!file.is_open()) {
+        cerr << "Error: Unable to open file for writing.\n";
+        return;
+    }
+
+    for (const auto& row : data) {
+        for (size_t i = 0; i < row.size(); ++i) {
+            file << row[i];
+            if (i < row.size() - 1) file << ",";
+        }
+        file << "\n";
+    }
     file.close();
 }
 
@@ -65,24 +82,6 @@ void CSVHandler::deleteRow(int rowNumber) {
         return;
     }
     data.erase(data.begin() + rowNumber);
-}
-
-void CSVHandler::saveCSV() const {
-    ofstream file("data/" + filename);
-
-    if (!file.is_open()) {
-        cerr << "Error: Unable to open file for writing.\n";
-        return;
-    }
-
-    for (const auto& row : data) {
-        for (size_t i = 0; i < row.size(); ++i) {
-            file << row[i];
-            if (i < row.size() - 1) file << ",";
-        }
-        file << "\n";
-    }
-    file.close();
 }
 
 // Function to show a simple menu and handle user input
