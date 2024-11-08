@@ -1,27 +1,25 @@
-#ifndef CSV_HPP
-#define CSV_HPP
+#ifndef CSV1_HPP
+#define CSV1_HPP
 
-#include <iostream>
-#include <fstream>
-#include <sstream>
 #include <vector>
 #include <string>
-#include "BTree.hpp"
+#include <iostream>
 
-using namespace std;
-
-class CSVReader {
-public:
-    CSVReader(const string& filename);
-    vector<vector<string>> readCSV();
-
+class CSVHandler {
 private:
-    string filename;
-};
+    std::string filename;
+    std::vector<std::vector<std::string>> data;
 
-class CSVToBTreeConverter {
 public:
-    BTree convertToBTree(const string& filename, int degree);
+    CSVHandler(const std::string& filename);
+    void loadCSV();
+    void displayCSV() const;
+    
+    void addRow(const std::vector<std::string>& row);
+    void updateRow(int rowNumber, const std::vector<std::string>& newRow);
+    void deleteRow(int rowNumber);
+    void saveCSV() const;
+    void menu();  // New menu function for interactive mode
 };
 
-#endif
+#endif // CSV1_HPP
