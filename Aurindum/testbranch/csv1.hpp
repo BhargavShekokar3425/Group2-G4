@@ -5,18 +5,24 @@
 #include <string>
 #include <iostream>
 
+using namespace std;
+
 class CSVHandler {
 private:
-    std::string filename;
-    std::vector<std::vector<std::string>> data;
+    string filename;
+    vector<vector<string>> data;
+
+    // Private helper functions
+    bool isValidRow(const vector<string>& row) const;
+    bool isUniqueID(const string& id) const;
 
 public:
-    CSVHandler(const std::string& filename);
+    CSVHandler(const string& filename);
     void loadCSV();
     void displayCSV() const;
-    
-    void addRow(const std::vector<std::string>& row);
-    void updateRow(int rowNumber, const std::vector<std::string>& newRow);
+
+    void addRow(const vector<string>& row);
+    void updateRow(int rowNumber, const vector<string>& newRow);
     void deleteRow(int rowNumber);
     void saveCSV() const;
     void menu();  // New menu function for interactive mode
