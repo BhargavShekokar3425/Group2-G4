@@ -4,6 +4,13 @@
 - merge(x, identityElement) = x
 - identityTransformation.combine(x) = x
 */
+
+#include <bits/stdc++.h>
+#include <iostream>
+
+using namespace std;
+
+
 class Node{
 public:
 	int v = 0; //We can use more variables depending on what all info we need !
