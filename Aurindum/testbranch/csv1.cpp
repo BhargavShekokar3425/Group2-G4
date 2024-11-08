@@ -8,8 +8,8 @@ using namespace std;
 CSVHandler::CSVHandler(const string& filename) : filename(filename) {}
 void CSVHandler::loadCSV() {
     data.clear();
-    cout << ("./testbranch/data/" + filename) << endl;
-    ifstream file("./testbranch/data/" + filename);
+    cout << ("Enter your absolute path here.") << endl;
+    ifstream file("Enter your absolute path here.");
 
     if (!file.is_open()) {
         cerr << "Error: File " << filename << " does not exist in the data folder.\n";
@@ -32,7 +32,7 @@ void CSVHandler::loadCSV() {
 }
 
 void CSVHandler::saveCSV() const {
-    ofstream file("./testbranch/data/" + filename);
+    ofstream file("Enter your absolute path here.");
 
     if (!file.is_open()) {
         cerr << "Error: Unable to open file for writing.\n";
