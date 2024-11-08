@@ -2,14 +2,15 @@
 #include <iomanip>
 #include <sstream>
 #include <fstream>
+#include <regex>
 
 using namespace std;
 
 CSVHandler::CSVHandler(const string& filename) : filename(filename) {}
+
 void CSVHandler::loadCSV() {
     data.clear();
-    cout << ("Enter your absolute path here.") << endl;
-    ifstream file("Enter your absolute path here.");
+    ifstream file("D:\\MyStuff\\College\\S-RAID\\GitHubRepos\\DSAGroup2-G4\\Aurindum\\testbranch\\data\\tab1.csv");
 
     if (!file.is_open()) {
         cerr << "Error: File " << filename << " does not exist in the data folder.\n";
@@ -32,7 +33,7 @@ void CSVHandler::loadCSV() {
 }
 
 void CSVHandler::saveCSV() const {
-    ofstream file("Enter your absolute path here.");
+    ofstream file("D:\\MyStuff\\College\\S-RAID\\GitHubRepos\\DSAGroup2-G4\\Aurindum\\testbranch\\data\\tab1.csv");
 
     if (!file.is_open()) {
         cerr << "Error: Unable to open file for writing.\n";
@@ -64,8 +65,41 @@ void CSVHandler::displayCSV() const {
     }
 }
 
+bool CSVHandler::isValidRow(const vector<string>& row) const {
+    if (row.size() != 4) return false;
+
+    // Check if ID is an integer
+    if (!regex_match(row[0], regex("\\d+"))) return false;
+
+    // Check if Age is an integer
+    if (!regex_match(row[2], regex("\\d+"))) return false;
+
+    // Check if Salary is a float
+    if (!regex_match(row[3], regex("^[0-9]*\\.?[0-9]+$"))) return false;
+
+    return true;
+}
+
+bool CSVHandler::isUniqueID(const string& id) const {
+    for (const auto& row : data) {
+        if (!row.empty() && row[0] == id) {
+            return false;
+        }
+    }
+    return true;
+}
+
 void CSVHandler::addRow(const vector<string>& row) {
+    if (!isValidRow(row)) {
+        cerr << "Error: Invalid data types in row. Expected format: ID[int], Name[string], Age[int], Salary[float].\n";
+        return;
+    }
+    if (!isUniqueID(row[0])) {
+        cerr << "Error: ID " << row[0] << " already exists.\n";
+        return;
+    }
     data.push_back(row);
+    cout << "Row added successfully.\n";
 }
 
 void CSVHandler::updateRow(int rowNumber, const vector<string>& newRow) {
@@ -73,8 +107,18 @@ void CSVHandler::updateRow(int rowNumber, const vector<string>& newRow) {
         cerr << "Error: Invalid row number.\n";
         return;
     }
+    if (!isValidRow(newRow)) {
+        cerr << "Error: Invalid data types in row. Expected format: ID[int], Name[string], Age[int], Salary[float].\n";
+        return;
+    }
+    if (newRow[0] != data[rowNumber][0] && !isUniqueID(newRow[0])) {
+        cerr << "Error: ID " << newRow[0] << " already exists.\n";
+        return;
+    }
     data[rowNumber] = newRow;
+    cout << "Row updated successfully.\n";
 }
+
 
 void CSVHandler::deleteRow(int rowNumber) {
     if (rowNumber < 0 || rowNumber >= static_cast<int>(data.size())) {
@@ -82,6 +126,7 @@ void CSVHandler::deleteRow(int rowNumber) {
         return;
     }
     data.erase(data.begin() + rowNumber);
+    cout << "Row deleted successfully.\n";
 }
 
 // Function to show a simple menu and handle user input
