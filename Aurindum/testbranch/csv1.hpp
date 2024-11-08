@@ -14,6 +14,7 @@ public:
     CSVHandler(const std::string& filename);
     void loadCSV();
     void displayCSV() const;
+    
     void addRow(const std::vector<std::string>& row);
     void updateRow(int rowNumber, const std::vector<std::string>& newRow);
     void deleteRow(int rowNumber);
