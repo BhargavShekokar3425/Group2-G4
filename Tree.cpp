@@ -1,7 +1,7 @@
 #include <bits/stdc++.h>
 #include "BTree.hpp"
-#include "SegmentTree.hpp"
-#include "BST.hpp"
+#include "SegmentTree.cpp"
+#include "BST.cpp"
 using namespace std;
 
 int main() {
