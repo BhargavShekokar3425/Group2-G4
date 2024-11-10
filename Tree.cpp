@@ -47,12 +47,12 @@ int main() {
     vector<int> segmentData;
     //Input of data
     while(true){
-        if(deg==3){
-            int key; string name; int attribute1;
-            cin>>key>>name>>attribute1;
-            btree.insert(key,name,attribute1);
-            segmentData.push_back(attribute1);   
-        }
+        // if(deg==3){
+        //     int key; string name; int attribute1;
+        //     cin>>key>>name>>attribute1;
+        //     btree.insert(key,name,attribute1);
+        //     segmentData.push_back(attribute1);   
+        // }
         if(deg==4){
             int key; string name; int attribute1; float attribute2;
             cin>>key>>name>>attribute1>>attribute2;
