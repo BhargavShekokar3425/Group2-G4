@@ -31,10 +31,7 @@ class BTree {
     int t;
 
 public:
-    BTree(int _t) {
-        root = nullptr;
-        t = _t;
-    }
+    BTree(int _t);
 
     void insert(int key, const string& name, int age, float salary);
     void remove(int key);
