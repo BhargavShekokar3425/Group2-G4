@@ -266,7 +266,7 @@ int main() {
     
     // }
     }
-    cout<<"Want to query more?Enter 1 to continue, 0 to exit"<<endl;
+    cout<<"Want to query more? Enter 1 to continue, 0 to exit"<<endl;
     int contChoice;cout<<"Enter your choice: "; cin>>contChoice;
     if(contChoice==0) break;
     }

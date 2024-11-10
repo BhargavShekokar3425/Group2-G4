@@ -1,6 +1,5 @@
+#include <bits/stdc++.h>
 #include <iostream>
-#include <vector>
-#include <string>
 using namespace std;
 
 class BTreeNode {
@@ -19,6 +18,7 @@ public:
     void splitChild(int i, BTreeNode *y);
     BTreeNode *search(int key);
     void remove(int key); // To be implemented fully as needed
+    void collectData(vector<tuple<int, string, int, float>>& data) const;
 
     void printAll();
     float querySum(); // Calculates the sum of salaries in this node and children recursively
@@ -31,23 +31,27 @@ class BTree {
     int t;
 
 public:
-    BTree(int _t) {
-        root = nullptr;
-        t = _t;
-    }
-
+    BTree(int l);
     void insert(int key, const string& name, int age, float salary);
     void remove(int key);
     BTreeNode* search(int key);
     void update(int key, const string& name, int age, float salary);
     float querySum();
     void printAllRecords();
+    bool isTreeEmpty();
+    vector<tuple<int, string, int, float>> extractData() const;
 };
 
-BTreeNode::BTreeNode(int _t, bool _leaf) {
-    t = _t;
+BTreeNode::BTreeNode(int l, bool _leaf) {
+    t = l;
     leaf = _leaf;
 }
+
+bool BTree::isTreeEmpty(){
+    if(root==nullptr) return true;
+    return false;
+}
+
 
 void BTree::insert(int key, const string& name, int age, float salary) {
     if (root == nullptr) {
@@ -138,6 +142,11 @@ BTreeNode* BTreeNode::search(int key) {
     return children[i]->search(key);
 }
 
+BTree::BTree(int l) {
+    root = nullptr;
+    t = l;
+}
+
 void BTree::update(int key, const string& name, int age, float salary) {
     BTreeNode* node = search(key);
     if (node) {
@@ -165,6 +174,27 @@ void BTreeNode::printAll() {
 void BTree::printAllRecords() {
     if (root) root->printAll();
 }
+
+void BTreeNode::collectData(vector<tuple<int, string, int, float>>& data) const {
+        for (size_t i = 0; i < keys.size(); i++) {
+            // Add the data for each key to the vector as a tuple
+            data.emplace_back(keys[i], names[i], ages[i], salaries[i]);
+        }
+        // Traverse each child node, if not a leaf node
+        if (!leaf) {
+            for (auto child : children) {
+                child->collectData(data);
+            }
+        }
+    }
+
+vector<tuple<int, string, int, float>> BTree::extractData() const {
+        vector<tuple<int, string, int, float>> data;
+        if (root) {
+            root->collectData(data);
+        }
+        return data;
+    }
 
 float BTreeNode::querySum() {
     float sum = 0;
@@ -221,7 +251,7 @@ void BTree::remove(int key) {
         }
     }
 }
-
+/*
 int main() {
     BTree tree(3);
     int choice;
@@ -299,3 +329,4 @@ int main() {
 
     return 0;
 }
+*/

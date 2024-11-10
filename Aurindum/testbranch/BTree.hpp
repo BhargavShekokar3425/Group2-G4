@@ -23,6 +23,7 @@ public:
     void splitChild(int i, BTreeNode *y);
     BTreeNode *search(int key);
     void remove(int key); // To be implemented fully as needed
+    void collectData(vector<tuple<int, string, int, float>>& data) const;
 
     void printAll();
     float querySum(); // Calculates the sum of salaries in this node and children recursively
@@ -35,7 +36,7 @@ class BTree {
     int t;
 
 public:
-    BTree(int _t);
+    BTree(int l);
 
     void insert(int key, const string& name, int age, float salary);
     void remove(int key);
@@ -43,6 +44,8 @@ public:
     void update(int key, const string& name, int age, float salary);
     float querySum();
     void printAllRecords();
+    vector<tuple<int, string, int, float>> extractData() const;
+    bool isTreeEmpty();
 };
 
 #endif // BTREE_HPP
