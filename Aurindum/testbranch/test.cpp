@@ -7,6 +7,8 @@
 
 #include <bits/stdc++.h>
 #include <iostream>
+#include <sstream>
+#include <fstream>
 
 using namespace std;
 
@@ -42,6 +44,21 @@ public:
 		node.v += (tr - tl + 1) * v; // 7. applying the update received on the node
 	}	
 };
+
+bool filexstchk(string filename){
+	ifstream bob(filename);
+
+	if (bob.is_open()) {
+		cerr << "Error: File " << filename << "exists. Choose another name." << endl;
+		return true;
+	}	
+
+	bob.close();
+	return false;
+	
+}
+
+
 
 template <typename node, typename update>
 class SegTree{
