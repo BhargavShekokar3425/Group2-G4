@@ -1,6 +1,4 @@
-#include <iostream>
-#include <vector>
-#include <string>
+#include <bits/stdc++.h>
 using namespace std;
 
 class BTreeNode {
@@ -19,7 +17,12 @@ public:
     void splitChild(int i, BTreeNode *y);
     BTreeNode *search(int key);
     void remove(int key); // To be implemented fully as needed
-
+    void collectData(vector<tuple<int, string, int, float>>& data) const;
+    void printRangeInorder(float lowerLimit, float upperLimit, int attribute);
+    void printEqualInorder(float threshold, int attribute);
+    void printGreaterInorder(float threshold, int attribute);
+    void printLessInorder(float threshold, int attribute);
+    
     void printAll();
     float querySum(); // Calculates the sum of salaries in this node and children recursively
 
@@ -27,24 +30,40 @@ public:
 };
 
 class BTree {
+    public:
     BTreeNode *root;
     int t;
 
-public:
-    BTree(int _t);
 
+    BTree(int l);
     void insert(int key, const string& name, int age, float salary);
     void remove(int key);
     BTreeNode* search(int key);
     void update(int key, const string& name, int age, float salary);
+    void updateAddAge(int key, int add);
+    void updateAge(int key, int age);
     float querySum();
     void printAllRecords();
+    bool isTreeEmpty();
+    void printGreater(int attributes);
+    void printLess(int attributes);
+    void updateSalary(int key, float add);
+    void updateAddSalary(int key, float salary);
+    void printRange(int attributes);
+    void printEqual(int attributes);
+    vector<tuple<int, string, int, float>> extractData() const;
 };
 
-BTreeNode::BTreeNode(int _t, bool _leaf) {
-    t = _t;
+BTreeNode::BTreeNode(int l, bool _leaf) {
+    t = l;
     leaf = _leaf;
 }
+
+bool BTree::isTreeEmpty(){
+    if(root==nullptr) return true;
+    return false;
+}
+
 
 void BTree::insert(int key, const string& name, int age, float salary) {
     if (root == nullptr) {
@@ -135,6 +154,11 @@ BTreeNode* BTreeNode::search(int key) {
     return children[i]->search(key);
 }
 
+BTree::BTree(int l) {
+    root = nullptr;
+    t = l;
+}
+
 void BTree::update(int key, const string& name, int age, float salary) {
     BTreeNode* node = search(key);
     if (node) {
@@ -142,6 +166,70 @@ void BTree::update(int key, const string& name, int age, float salary) {
             if (node->keys[i] == key) {
                 node->names[i] = name;
                 node->ages[i] = age;
+                node->salaries[i] = salary;
+                cout << "Record updated successfully!" << endl;
+                return;
+            }
+        }
+    }
+    cout << "Record not found!" << endl;
+}
+
+void BTree::updateAddAge(int key, int add) {
+    BTreeNode* node = search(key);
+    if (node) {
+        for (size_t i = 0; i < node->keys.size(); i++) {
+            if (node->keys[i] == key) {
+                //node->names[i] = name;
+                node->ages[i] += add;
+                //node->salaries[i] = salary;
+                cout << "Record updated successfully!" << endl;
+                return;
+            }
+        }
+    }
+    cout << "Record not found!" << endl;
+}
+void BTree::updateAge(int key, int age) {
+    BTreeNode* node = search(key);
+    if (node) {
+        for (size_t i = 0; i < node->keys.size(); i++) {
+            if (node->keys[i] == key) {
+                //node->names[i] = name;
+                node->ages[i] = age;
+                //node->salaries[i] = salary;
+                cout << "Record updated successfully!" << endl;
+                return;
+            }
+        }
+    }
+    cout << "Record not found!" << endl;
+}
+
+
+void BTree::updateAddSalary(int key, float add) {
+    BTreeNode* node = search(key);
+    if (node) {
+        for (size_t i = 0; i < node->keys.size(); i++) {
+            if (node->keys[i] == key) {
+                //node->names[i] = name;
+                //node->ages[i] += add;
+                node->salaries[i] += add;
+                cout << "Record updated successfully!" << endl;
+                return;
+            }
+        }
+    }
+    cout << "Record not found!" << endl;
+}
+
+void BTree::updateSalary(int key, float salary) {
+    BTreeNode* node = search(key);
+    if (node) {
+        for (size_t i = 0; i < node->keys.size(); i++) {
+            if (node->keys[i] == key) {
+                //node->names[i] = name;
+                //node->ages[i] = age;
                 node->salaries[i] = salary;
                 cout << "Record updated successfully!" << endl;
                 return;
@@ -162,6 +250,27 @@ void BTreeNode::printAll() {
 void BTree::printAllRecords() {
     if (root) root->printAll();
 }
+
+void BTreeNode::collectData(vector<tuple<int, string, int, float>>& data) const {
+        for (size_t i = 0; i < keys.size(); i++) {
+            // Add the data for each key to the vector as a tuple
+            data.emplace_back(keys[i], names[i], ages[i], salaries[i]);
+        }
+        // Traverse each child node, if not a leaf node
+        if (!leaf) {
+            for (auto child : children) {
+                child->collectData(data);
+            }
+        }
+    }
+
+vector<tuple<int, string, int, float>> BTree::extractData() const {
+        vector<tuple<int, string, int, float>> data;
+        if (root) {
+            root->collectData(data);
+        }
+        return data;
+    }
 
 float BTreeNode::querySum() {
     float sum = 0;
@@ -219,6 +328,239 @@ void BTree::remove(int key) {
     }
 }
 
+
+
+
+void BTreeNode::printRangeInorder(float lowerLimit, float upperLimit, int attribute) {
+    // First recur on left child
+    if (!leaf) {
+        children[0]->printRangeInorder(lowerLimit, upperLimit, attribute);
+    }
+
+    // Process current node's keys
+    for (size_t i = 0; i < keys.size(); i++) {
+        // Check if we need to recur on child before processing current key
+        if (!leaf && i < children.size() - 1) {
+            children[i + 1]->printRangeInorder(lowerLimit, upperLimit, attribute);
+        }
+
+        // Check if current value is within range based on attribute
+        if (attribute == 0) { // Age range
+            if (ages[i] >= lowerLimit && ages[i] <= upperLimit) {
+                cout << "ID: " << keys[i] 
+                     << ", Name: " << names[i] 
+                     << ", Age: " << ages[i] 
+                     << ", Salary: " << salaries[i] << endl;
+            }
+        } else if (attribute == 1) { // Salary range
+            if (salaries[i] >= lowerLimit && salaries[i] <= upperLimit) {
+                cout << "ID: " << keys[i] 
+                     << ", Name: " << names[i] 
+                     << ", Age: " << ages[i] 
+                     << ", Salary: " << salaries[i] << endl;
+            }
+        }
+    }
+
+    // Process last child if it exists
+    if (!leaf && !children.empty()) {
+        children[children.size() - 1]->printRangeInorder(lowerLimit, upperLimit, attribute);
+    }
+}
+
+// Modified BTree::printRange implementation:
+void BTree::printRange(int attributes) {
+    if (!root) {
+        cout << "Tree is empty!" << endl;
+        return;
+    }
+
+    float lowerLimit, upperLimit;
+    cout << "Enter the value for range: (lower limit, upper limit)" << endl;
+    cout << "lower limit: ";
+    cin >> lowerLimit;
+    cout << "upper limit: ";
+    cin >> upperLimit;
+
+    if (attributes == 0) {
+        cout << "\nRecords with Age between " << lowerLimit << " and " << upperLimit << ":\n";
+    } else if (attributes == 1) {
+        cout << "\nRecords with Salary between " << lowerLimit << " and " << upperLimit << ":\n";
+    }
+
+    root->printRangeInorder(lowerLimit, upperLimit, attributes);
+}
+
+// In BTreeNode class add these helper functions:
+void BTreeNode::printGreaterInorder(float threshold, int attribute) {
+    // First recur on left child
+    if (!leaf) {
+        children[0]->printGreaterInorder(threshold, attribute);
+    }
+
+    // Process current node's keys
+    for (size_t i = 0; i < keys.size(); i++) {
+        // Check child before current key
+        if (!leaf && i < children.size() - 1) {
+            children[i + 1]->printGreaterInorder(threshold, attribute);
+        }
+
+        // Check if current value is greater than threshold
+        if (attribute == 0) { // Age
+            if (ages[i] > threshold) {
+                cout << "ID: " << keys[i] 
+                     << ", Name: " << names[i] 
+                     << ", Age: " << ages[i] 
+                     << ", Salary: " << salaries[i] << endl;
+            }
+        } else if (attribute == 1) { // Salary
+            if (salaries[i] > threshold) {
+                cout << "ID: " << keys[i] 
+                     << ", Name: " << names[i] 
+                     << ", Age: " << ages[i] 
+                     << ", Salary: " << salaries[i] << endl;
+            }
+        }
+    }
+
+    // Process last child if it exists
+    if (!leaf && !children.empty()) {
+        children[children.size() - 1]->printGreaterInorder(threshold, attribute);
+    }
+}
+
+void BTreeNode::printLessInorder(float threshold, int attribute) {
+    // First recur on left child
+    if (!leaf) {
+        children[0]->printLessInorder(threshold, attribute);
+    }
+
+    // Process current node's keys
+    for (size_t i = 0; i < keys.size(); i++) {
+        // Check child before current key
+        if (!leaf && i < children.size() - 1) {
+            children[i + 1]->printLessInorder(threshold, attribute);
+        }
+
+        // Check if current value is less than threshold
+        if (attribute == 0) { // Age
+            if (ages[i] < threshold) {
+                cout << "ID: " << keys[i] 
+                     << ", Name: " << names[i] 
+                     << ", Age: " << ages[i] 
+                     << ", Salary: " << salaries[i] << endl;
+            }
+        } else if (attribute == 1) { // Salary
+            if (salaries[i] < threshold) {
+                cout << "ID: " << keys[i] 
+                     << ", Name: " << names[i] 
+                     << ", Age: " << ages[i] 
+                     << ", Salary: " << salaries[i] << endl;
+            }
+        }
+    }
+
+    // Process last child if it exists
+    if (!leaf && !children.empty()) {
+        children[children.size() - 1]->printLessInorder(threshold, attribute);
+    }
+}
+
+void BTreeNode::printEqualInorder(float threshold, int attribute) {
+    // First recur on left child
+    if (!leaf) {
+        children[0]->printEqualInorder(threshold, attribute);
+    }
+
+    // Process current node's keys
+    for (size_t i = 0; i < keys.size(); i++) {
+        // Check child before current key
+        if (!leaf && i < children.size() - 1) {
+            children[i + 1]->printEqualInorder(threshold, attribute);
+        }
+
+        // Check if current value equals threshold
+        if (attribute == 0) { // Age
+            if (ages[i] == threshold) {
+                cout << "ID: " << keys[i] 
+                     << ", Name: " << names[i] 
+                     << ", Age: " << ages[i] 
+                     << ", Salary: " << salaries[i] << endl;
+            }
+        } else if (attribute == 1) { // Salary
+            if (abs(salaries[i] - threshold) < 0.001) { // Using small epsilon for float comparison
+                cout << "ID: " << keys[i] 
+                     << ", Name: " << names[i] 
+                     << ", Age: " << ages[i] 
+                     << ", Salary: " << salaries[i] << endl;
+            }
+        }
+    }
+
+    // Process last child if it exists
+    if (!leaf && !children.empty()) {
+        children[children.size() - 1]->printEqualInorder(threshold, attribute);
+    }
+}
+
+// In BTree class, implement these methods:
+void BTree::printGreater(int attributes) {
+    if (!root) {
+        cout << "Tree is empty!" << endl;
+        return;
+    }
+
+    float threshold;
+    cout << "Enter the threshold value: ";
+    cin >> threshold;
+
+    if (attributes == 0) {
+        cout << "\nRecords with Age greater than " << threshold << ":\n";
+    } else if (attributes == 1) {
+        cout << "\nRecords with Salary greater than " << threshold << ":\n";
+    }
+
+    root->printGreaterInorder(threshold, attributes);
+}
+
+void BTree::printLess(int attributes) {
+    if (!root) {
+        cout << "Tree is empty!" << endl;
+        return;
+    }
+
+    float threshold;
+    cout << "Enter the threshold value: ";
+    cin >> threshold;
+
+    if (attributes == 0) {
+        cout << "\nRecords with Age less than " << threshold << ":\n";
+    } else if (attributes == 1) {
+        cout << "\nRecords with Salary less than " << threshold << ":\n";
+    }
+
+    root->printLessInorder(threshold, attributes);
+}
+
+void BTree::printEqual(int attributes) {
+    if (!root) {
+        cout << "Tree is empty!" << endl;
+        return;
+    }
+
+    float threshold;
+    cout << "Enter the value to match: ";
+    cin >> threshold;
+
+    if (attributes == 0) {
+        cout << "\nRecords with Age equal to " << threshold << ":\n";
+    } else if (attributes == 1) {
+        cout << "\nRecords with Salary equal to " << threshold << ":\n";
+    }
+
+    root->printEqualInorder(threshold, attributes);
+}
+/*
 int main() {
     BTree tree(3);
     int choice;
@@ -296,3 +638,4 @@ int main() {
 
     return 0;
 }
+*/
