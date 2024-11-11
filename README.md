@@ -59,6 +59,7 @@ This project is organized to simulate a database environment with optimized quer
    - Queries with a `WHERE` clause are filtered before aggregation, providing an efficient way to handle conditional queries.
 3. **Getting Results**: The system provides quick results by leveraging Segment Trees, making the querying experience seamless even with large datasets.
 
+Run Command:  g++ -o main tree0.cpp BTree.cpp segtree.cpp csvAaryan.cpp -I.
 ---
 
 ## 📚 Resources
